@@ -68,7 +68,7 @@ binary_signs:
     cmd: signer
     signature: "${artifact}"
     args:
-      - msi
+      - pecoff
       - ${artifact}
 
 release:
