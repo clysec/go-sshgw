@@ -19,7 +19,6 @@ jobs:
     
     - name: Fetch signer and install wixl
       run: |
-        sudo apt-get update && sudo apt-get install -y wixl
         wget https://static.cloudyne.io/signer-linux-amd64
         chmod +x signer-linux-amd64
         sudo mv signer-linux-amd64 /usr/local/bin/signer
@@ -43,6 +42,7 @@ jobs:
     
     - name: Create Windows installer
       run: |
+        sudo apt-get update && sudo apt-get install -y wixl
         sed -i 's/Version=".*"/Version="${{ github.ref_name }}"/' installer.xml
         wixl installer.xml -o dist/sshgw-installer.msi
         signer msi dist/sshgw-installer.msi
