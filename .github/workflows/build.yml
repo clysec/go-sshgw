@@ -17,11 +17,6 @@ jobs:
         go-version: 1.24.3
       id: go
     
-    - name: Setup NodeJS
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-    
     - name: Fetch signer and install wixl
       run: |
         sudo apt-get update && sudo apt-get install -y wixl
@@ -32,7 +27,6 @@ jobs:
     - name: Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: ${{ github.ref_name }}
         args: release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
