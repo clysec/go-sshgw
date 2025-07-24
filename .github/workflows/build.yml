@@ -1,0 +1,57 @@
+name: Build and Publish Packages
+
+on:
+  push:
+    tags: ["*.*.*"]
+
+jobs:
+  build:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.24.3
+      id: go
+    
+    - name: Setup NodeJS
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    
+    - name: Fetch signer and install wixl
+      run: |
+        sudo apt-get update && sudo apt-get install -y wixl
+        wget https://static.cloudyne.io/signer-linux-amd64
+        chmod +x signer-linux-amd64
+        sudo mv signer-linux-amd64 /usr/local/bin/signer
+
+    - name: Goreleaser
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        version: ${{ github.event.release.tag.name }}
+        args: release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        UPLOAD_DEBPKG_SECRET: ${{ secrets.UPLOAD_DEBPKG_SECRET }}
+        UPLOAD_APKPKG_SECRET: ${{ secrets.UPLOAD_DEBPKG_SECRET }}
+        UPLOAD_RPMPKG_SECRET: ${{ secrets.UPLOAD_DEBPKG_SECRET }}
+        UPLOAD_DEBPKG_USER: ${{ secrets.UPLOAD_DEBPKG_USER }}
+        OSCS_AKV_URL: ${{ secrets.OSCS_AKV_URL }}
+        OSCS_AKV_CERT: ${{ secrets.OSCS_AKV_CERT }}
+        OSCS_AKV_CERT_VERSION: ${{ secrets.OSCS_AKV_CERT_VERSION }}
+        OSCS_AKV_TENANT: ${{ secrets.OSCS_AKV_TENANT }}
+        OSCS_AKV_CLIENT: ${{ secrets.OSCS_AKV_CLIENT }}
+        OSCS_AKV_SECRET: ${{ secrets.OSCS_AKV_SECRET }}
+    
+    - name: Create Windows installer
+      run: wixl installer.xml -o dist/sshgw-installer.msi
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release
+        path: dist/**

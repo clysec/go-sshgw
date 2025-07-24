@@ -1,0 +1,105 @@
+version: 2
+
+builds:
+  - main: .
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+    binary: sshgw
+
+  - id: winbuild
+    main: .
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+    goarch:
+      - amd64
+    binary: sshgw
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+
+    format_overrides:
+      - goos: windows
+        format: zip
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+nfpms:
+  - id: sshgw
+    package_name: "sshgw"
+    description: "sshgw - SSH over TLS Gateway"
+    vendor: "clysec"
+    maintainer: clysec <itsec@cloudyne.org>
+    file_name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    formats:
+      - deb
+      - apk
+      - rpm
+    bindir: /usr/local/bin
+
+binary_signs:
+  - id: sshgw
+    ids:
+      - winbuild
+    cmd: signer
+    signature: "${artifact}"
+    args:
+      - msi
+      - ${artifact}
+
+release:
+  github:
+    owner: clysec
+    name: ssh-gw
+
+uploads:
+  - name: "debpkg"
+    method: "PUT"
+    exts:
+      - deb
+    mode: archive
+    username: "debian_upload"
+    target: https://git.cloudyne.io/api/packages/linux/debian/pool/all/main/upload
+    custom_artifact_name: true
+
+  - name: "apkpkg"
+    method: "PUT"
+    exts:
+      - apk
+    mode: archive
+    username: "debian_upload"
+    target: https://git.cloudyne.io/api/packages/linux/alpine/all/repository
+    custom_artifact_name: true
+
+  - name: "rpmpkg"
+    method: "PUT"
+    exts:
+      - rpm
+    mode: archive
+    username: "debian_upload"
+    target: https://git.cloudyne.io/api/packages/linux/rpm/upload
+    custom_artifact_name: true
