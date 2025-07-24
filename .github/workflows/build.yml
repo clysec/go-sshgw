@@ -45,6 +45,14 @@ jobs:
       run: |
         sed -i 's/Version=".*"/Version="${{ github.ref_name }}"/' installer.xml
         wixl installer.xml -o dist/sshgw-installer.msi
+        signer msi dist/sshgw-installer.msi
+      env:
+        OSCS_AKV_URL: ${{ secrets.OSCS_AKV_URL }}
+        OSCS_AKV_CERT: ${{ secrets.OSCS_AKV_CERT }}
+        OSCS_AKV_CERT_VERSION: ${{ secrets.OSCS_AKV_CERT_VERSION }}
+        OSCS_AKV_TENANT: ${{ secrets.OSCS_AKV_TENANT }}
+        OSCS_AKV_CLIENT: ${{ secrets.OSCS_AKV_CLIENT }}
+        OSCS_AKV_SECRET: ${{ secrets.OSCS_AKV_SECRET }}
       
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
