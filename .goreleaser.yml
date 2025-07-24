@@ -74,7 +74,7 @@ binary_signs:
 release:
   github:
     owner: clysec
-    name: ssh-gw
+    name: go-sshgw
 
 uploads:
   - name: "debpkg"

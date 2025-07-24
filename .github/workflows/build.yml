@@ -32,14 +32,14 @@ jobs:
     - name: Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: ${{ github.event.release.tag.name }}
+        version: ${{ github.ref_name }}
         args: release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        UPLOAD_DEBPKG_SECRET: ${{ secrets.UPLOAD_DEBPKG_SECRET }}
-        UPLOAD_APKPKG_SECRET: ${{ secrets.UPLOAD_DEBPKG_SECRET }}
-        UPLOAD_RPMPKG_SECRET: ${{ secrets.UPLOAD_DEBPKG_SECRET }}
-        UPLOAD_DEBPKG_USER: ${{ secrets.UPLOAD_DEBPKG_USER }}
+        UPLOAD_DEBPKG_SECRET: ${{ secrets.GITEA_TOKEN }}
+        UPLOAD_APKPKG_SECRET: ${{ secrets.GITEA_TOKEN }}
+        UPLOAD_RPMPKG_SECRET: ${{ secrets.GITEA_TOKEN }}
+        UPLOAD_DEBPKG_USER: ${{ secrets.GITEA_USER }}
         OSCS_AKV_URL: ${{ secrets.OSCS_AKV_URL }}
         OSCS_AKV_CERT: ${{ secrets.OSCS_AKV_CERT }}
         OSCS_AKV_CERT_VERSION: ${{ secrets.OSCS_AKV_CERT_VERSION }}
@@ -48,10 +48,21 @@ jobs:
         OSCS_AKV_SECRET: ${{ secrets.OSCS_AKV_SECRET }}
     
     - name: Create Windows installer
-      run: wixl installer.xml -o dist/sshgw-installer.msi
+      run: |
+        sed -i 's/Version=".*"/Version="${{ github.ref_name }}"/' installer.xml
+        wixl installer.xml -o dist/sshgw-installer.msi
       
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: release
         path: dist/**
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: dist/sshgw-installer.msi
+        asset_name: sshgw-installer.msi
+        tag: ${{ github.ref }}
+        overwrite: true
