@@ -1,6 +1,21 @@
 # Go SSH Gateway
 This is a simple SSH gateway setup using Go and HAProxy. It allows you to connect to multiple SSH servers through a single TLS entrypoint.
 
+## SSH Configuration
+### Linux
+To configure your SSH client to connect through the gateway, you can add the following lines to your `~/.ssh/config` file:
+
+```ssh
+Host server-to-connect
+  ProxyCommand /path/to/sshgw sshproxy.example.com:22 %h
+```
+
+You can then connect to the server using:
+
+```bash
+ssh server-to-connect
+```
+
 ## HAProxy Configuration
 ### Specific Servers
 This setup will allow you to connect to the servers "serverA" and "serverB" through the gateway. The configuration is done in the `haproxy.cfg` file.

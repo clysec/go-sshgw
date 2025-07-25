@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -33,10 +32,13 @@ func main() {
 	err = <-transport.ErrC
 
 	if err != nil {
-		log.Fatalf("Stream closed", err)
+		os.Stdout.WriteString("Error during copy: " + err.Error() + "\n")
+		log.Fatalf("Stream closed: %v", err)
+		os.Exit(1)
 	}
 
-	fmt.Println("Connection closed")
+	os.Stdout.WriteString("Connection closed by server\n")
+	os.Exit(0)
 }
 
 type sshTransport struct {

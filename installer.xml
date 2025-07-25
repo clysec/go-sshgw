@@ -1,45 +1,42 @@
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-  xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-  <Product Id="*" Name="Clysec SSH Gateway" UpgradeCode="ebe578ea-9175-4922-b993-fb951475e4b3" Language="1033" Codepage="1252" Version="1.0.1" Manufacturer="Cloudyne Systems (Scheibling Consulting AB)">
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product Id="*" Name="Clysec SSH Gateway" UpgradeCode="ebe578ea-9175-4922-b993-fb951475e4b3" Language="1033" Codepage="1252" Version="1.0.1" Manufacturer="Cloudyne Systems (Scheibling Consulting AB)">
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes"/>
     <Upgrade Id="ebe578ea-9175-4922-b993-fb951475e4b3">
       <UpgradeVersion Minimum="0.0.0" Property="PREVIOUSVERSIONSINSTALLED" IncludeMinimum="yes" IncludeMaximum="no"/>
     </Upgrade>
+    <Condition Message="A newer version of this software is already installed.">NOT NEWERVERSIONDETECTED</Condition>
     <InstallExecuteSequence>
       <RemoveExistingProducts Before="InstallInitialize"/>
     </InstallExecuteSequence>
-    <!-- <InstallUISequence>
-      <Show Dialog="InstallDlg" After="CostFinalize" />
-    </InstallUISequence> -->
     <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package" InstallScope="perUser" />
     <Media Id="1" Cabinet="app.cab" EmbedCab="yes"/>
     <Icon Id="icon.ico" SourceFile="app.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico"/>
+    
     <Directory Id="TARGETDIR" Name="SourceDir">
+      
       <Directory Id="LocalAppDataFolder">
-        <Directory Id="INSTALLDIR" Name="Clysec SSH Gateway">
-          <Component Id="sshgw.exe" Guid="*">
+        <Directory Id="INSTALLDIR" Name="Cloudyne">
+          <Component Id="ApplicationFiles" Guid="*">
             <File Id="sshgw.exe" Source="dist/winbuild_windows_amd64_v1/sshgw.exe" Name="sshgw.exe"/>
             <Shortcut Id="StartMenuShortcut" Advertise="yes" Icon="icon.ico" Name="Clysec SSH Gateway" Directory="ProgramMenuFolder" WorkingDirectory="INSTALLDIR" Description=""/>
             <Shortcut Id="DesktopShortcut" Advertise="yes" Icon="icon.ico" Name="Clysec SSH Gateway" Directory="DesktopFolder" WorkingDirectory="INSTALLDIR" Description=""/>
-            <!-- <Environment 
-              Id="PATH" 
-              Name="PATH" 
-              Value="[INSTALLDIR]" 
-              Permanent="yes" 
-              Part="last" 
-              Action="set" 
-              System="yes" /> -->
           </Component>
         </Directory>
       </Directory>
     </Directory>
-    <!-- <UI>
-      <Dialog Id="InstallDlg" Width="370" Height="270" Title="[ProductName] Setup" NoMinimize="yes"></Dialog>
-    </UI> -->
-    <Feature Id="App" Level="1">
-      <ComponentRef Id="sshgw.exe"/>
 
+    <Feature Id="App" Level="1">
+      <ComponentRef Id="ApplicationFiles"/>
     </Feature>
+    <!-- <UI>
+         < ! - - Define the installer UI - - >
+         <UIRef Id="WixUI_HK" />
+      </UI> -->
+
+      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
+      <!-- this should help to propagate env var changes -->
+      <!-- <CustomActionRef Id="WixBroadcastEnvironmentChange" /> -->
   </Product>
 </Wix>
