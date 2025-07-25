@@ -1,6 +1,65 @@
 # Go SSH Gateway
 This is a simple SSH gateway setup using Go and HAProxy. It allows you to connect to multiple SSH servers through a single TLS entrypoint.
 
+## Installation
+### Binaries
+You can fetch the pre-built binaries for your platform from the [releases page](https://github.com/clysec/go-sshgw/releases).
+
+### Building from Source
+To build the binary from source, you need to have Go 1.24.3 installed. Clone the repository and run the following commands:
+
+```bash
+git clone https://github.com/clysec/go-sshgw.git
+cd go-sshgw
+go build -o sshgw
+```
+
+### Debian Package
+```
+# Ensure prerequisites are installed
+sudo apt-get update 
+sudo apt-get -y install gnupg2 apt-transport-https curl
+
+# Download and import the public key for verifying packages
+sudo curl https://pkg.cloudyne.io/debian/repository.key -o /etc/apt/keyrings/cydeb.asc
+
+# Add the package repository
+echo "deb [signed-by=/etc/apt/keyrings/cydeb.asc] https://pkg.cloudyne.io/debian all main" | sudo tee -a /etc/apt/sources.list.d/cydeb.list
+
+# Check that the repository works
+sudo apt-get update
+
+# Install the sshgw package
+sudo apt-get install sshgw
+```
+
+### RPM Package
+```bash
+# on RedHat based distributions
+dnf config-manager --add-repo https://git.cloudyne.io/api/packages/linux/rpm.repo
+
+# on SUSE based distributions
+zypper addrepo https://git.cloudyne.io/api/packages/linux/rpm.repo
+
+# Install
+dnf install sshgw --nogpgcheck
+```
+
+### Alpine
+```bash
+# get and save the key
+cd /etc/apk/keys && curl -JO https://git.cloudyne.io/api/packages/linux/alpine/key 
+
+# Add the following line to /etc/apk/repositories
+echo 'https://git.cloudyne.io/api/packages/linux/alpine/all/repository' >> /etc/apk/repositories
+
+# Update
+apk update
+
+# Install
+apk add sshgw
+```
+
 ## SSH Configuration
 ### Linux/Darwin
 First, download the `sshgw` binary and place it in your desired directory, for example `/usr/local/bin/sshgw`.
