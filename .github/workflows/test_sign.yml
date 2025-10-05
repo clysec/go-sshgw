@@ -2,6 +2,9 @@ name: Build and Publish Packages
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -20,7 +23,7 @@ jobs:
     - name: Build for Windows
       run: |
         mkdir -p dist
-        GOOS=windows GOARCH=amd64 go build -o dist/sshgw.exe ./cmd/sshgw
+        GOOS=windows GOARCH=amd64 go build -o dist/sshgw.exe main.go
     
     - name: Sign
       uses: ossign/ossign@main
